@@ -30,6 +30,15 @@ docker-compose up
 
 Access http://localhost to use the UI
 
+## Version and Authentication
+Every request should have the headers to define api version and authentication.
+
+For defining the API version use the header: "X-Service-Version" in the request. For test purpose there are two versions available: "v1" and "v2".
+
+Regarding authentication use the header: "Authorization" in the request passing a valid token. For test use the token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.wDWyyGem9YgXDDbH3Un7YYcTB8IcN_BE4BMmS1tvlnE". 
+
+In this implementation was used the JSON Web Token (JWT) to generate the token. If is necessary create other tokens use https://jwt.io/ with the key "top-secret-signin-value-key".
+
 ## Solution Architecture
 
 ![Solution Architecture](architecture_diagram.png)
