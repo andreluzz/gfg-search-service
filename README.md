@@ -1,0 +1,26 @@
+# Search Service Rest API
+
+## Running with Docker
+
+### To run the service container with docker
+
+1. Build the image
+``` 
+docker build -t andreluzz/go-gfg-search-service .
+```
+2. Run the image
+``` 
+docker run -it --network="host" andreluzz/go-gfg-search-service
+```
+> Using --network="host" assuming elasticsearch server is running on the host at port 9200
+
+### Docker Compose
+To execute the hole soluction with UI, Elasticsearch Server and Rest API service use docker-compose
+
+``` 
+docker-compose up 
+```
+
+## Solution Architecture
+
+![Solution Architecture](architecture_diagram.png)
