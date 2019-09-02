@@ -58,7 +58,7 @@ func generateSearchBody(qs, filter, sort, page, limit string) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("invalid page number: %v", page)
 		}
-		if f < 0 {
+		if f <= 0 {
 			f = 1
 		}
 		from = (f - 1) * size

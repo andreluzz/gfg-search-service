@@ -52,6 +52,24 @@ func TestGenerateSearchBody(t *testing.T) {
 	assert.NoError(t, err, "should not return error")
 }
 
+func TestGenerateSearchBodyNegativePageNumber(t *testing.T) {
+	q := ""
+	filter := ""
+	sort := ""
+	page := "-1"
+	limit := "20"
+
+	generatedQuery, err := generateSearchBody(q, filter, sort, page, limit)
+
+	expectedQuery := `{
+	"from": 0,
+	"size": 20
+}`
+
+	assert.Equal(t, expectedQuery, string(generatedQuery), "should be equals")
+	assert.NoError(t, err, "should not return error")
+}
+
 func TestGenerateSearchBodyInvalidPage(t *testing.T) {
 	q := "product_title"
 	filter := "brand:brand_name"

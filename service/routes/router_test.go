@@ -64,11 +64,11 @@ func TestGetProductsInvalidMethod(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
 
-func mockSearchIndexInvalid(esHost, index, q, filter, sort, page, limit string) (*storage.Response, error) {
+func mockSearchIndexInvalid(esHost, index, q, filter, sort, page, limit string, client storage.HTTPClient) (*storage.Response, error) {
 	return nil, fmt.Errorf("invalid query string parameters test")
 }
 
-func mockSearchIndex(esHost, index, q, filter, sort, page, limit string) (*storage.Response, error) {
+func mockSearchIndex(esHost, index, q, filter, sort, page, limit string, client storage.HTTPClient) (*storage.Response, error) {
 	mockData := `{
 		"hits" : {
 			"total" : 30,

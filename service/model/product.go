@@ -2,6 +2,8 @@ package model
 
 import (
 	"encoding/json"
+	"net/http"
+	"time"
 
 	"github.com/andreluzz/gfg-search-service/service/storage"
 )
@@ -21,10 +23,14 @@ type Products struct {
 	Results interface{} `json:"results"`
 }
 
-// GetProducts return a list of products
+// GetProducts return a list of products formated
 func (p *Products) GetProducts(esHost, query, filter, sort, page, limit string, storageSearchIndexFunc storage.Search) error {
 	sort = storage.ParseSortTextFields(sort, &Product{})
-	storageResponse, err := storageSearchIndexFunc(esHost, "products", query, filter, sort, page, limit)
+	storageResponse, err := storageSearchIndexFunc(esHost, "products", query, filter, sort, page, limit,
+		&http.Client{
+			Timeout: 10 * time.Second,
+		},
+	)
 	if err != nil {
 		return err
 	}
@@ -53,7 +59,11 @@ func (p *Products) GetProducts(esHost, query, filter, sort, page, limit string, 
 // GetProductsES return a list of products with the elasticsearch format
 func (p *Products) GetProductsES(esHost, query, filter, sort, page, limit string, storageSearchIndexFunc storage.Search) error {
 	sort = storage.ParseSortTextFields(sort, &Product{})
-	storageResponse, err := storageSearchIndexFunc(esHost, "products", query, filter, sort, page, limit)
+	storageResponse, err := storageSearchIndexFunc(esHost, "products", query, filter, sort, page, limit,
+		&http.Client{
+			Timeout: 10 * time.Second,
+		},
+	)
 	if err != nil {
 		return err
 	}

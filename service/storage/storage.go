@@ -5,26 +5,33 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 )
 
 //Search defines a storage search interface to simplify the unit tests
-type Search func(esHost, index, q, filter, sort, page, limit string) (*Response, error)
+type Search func(esHost, index, q, filter, sort, page, limit string, client HTTPClient) (*Response, error)
+
+// HTTPClient interaface to simplify the unit tests
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
 
 // Response defines the struct to parse the elasticsearch response
 type Response struct {
 	Hits struct {
-		Total int `json:"total"`
-		Hits  []struct {
-			ID     string      `json:"_id"`
-			Source interface{} `json:"_source"`
-		} `json:"hits"`
+		Total int   `json:"total"`
+		Hits  []Hit `json:"hits"`
 	} `json:"hits"`
+}
+
+// Hit defines a documento from the elasticsearch response
+type Hit struct {
+	ID     string      `json:"_id"`
+	Source interface{} `json:"_source"`
 }
 
 // SearchIndex returns a list of documents from the defined index
 // applying filter, query, sort and page
-func SearchIndex(esHost, index, q, filter, sort, page, limit string) (*Response, error) {
+func SearchIndex(esHost, index, q, filter, sort, page, limit string, client HTTPClient) (*Response, error) {
 	query, err := generateSearchBody(q, filter, sort, page, limit)
 	if err != nil {
 		return nil, err
@@ -34,9 +41,6 @@ func SearchIndex(esHost, index, q, filter, sort, page, limit string) (*Response,
 	req, err := http.NewRequest(http.MethodGet, url, bytes.NewBuffer(query))
 	req.Header.Add("content-type", "application/json")
 
-	client := http.Client{
-		Timeout: time.Duration(15 * time.Second),
-	}
 	res, err := client.Do(req)
 
 	if err != nil {
@@ -47,8 +51,6 @@ func SearchIndex(esHost, index, q, filter, sort, page, limit string) (*Response,
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("invalid response code: %d", res.StatusCode)
 	}
-
-	defer res.Body.Close()
 
 	resp := &Response{}
 	if err := json.NewDecoder(res.Body).Decode(resp); err != nil {

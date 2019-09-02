@@ -23,14 +23,3 @@ func Logging(next http.HandlerFunc) http.HandlerFunc {
 		log.Println(r.Method, rec.status, r.Host, r.URL.RequestURI())
 	})
 }
-
-// // Logging log service requests
-// func Logging(logger *log.Logger) func(http.HandlerFunc) http.HandlerFunc {
-// 	return func(next http.HandlerFunc) http.HandlerFunc {
-// 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 			rec := statusRecorder{w, 200}
-// 			next.ServeHTTP(&rec, r)
-// 			logger.Println(r.Method, rec.status, r.Host, r.URL.RequestURI())
-// 		})
-// 	}
-// }

@@ -21,13 +21,6 @@ func main() {
 		esHost = "http://localhost:9200"
 	}
 
-	// execute dataset.sh to index documents to elasticsearch for testing purpose
-	cmd := exec.Command("./dataset.sh", esHost)
-	err := cmd.Run()
-	if err != nil {
-		log.Printf("invalid dataset creation script. %v", err)
-	}
-
 	r := routes.New(esHost, storage.SearchIndex)
 	server := &http.Server{
 		Addr:         ":8080",
@@ -49,6 +42,26 @@ func main() {
 			fmt.Printf("listen: %s\n", err)
 		}
 	}()
+
+	// execute dataset.sh to index documents to elasticsearch for testing purpose
+	// retry every 5 seconds to wait elasticsearch to be ready
+	retry := 0
+	for {
+		cmd := exec.Command("./dataset.sh", esHost)
+		err := cmd.Run()
+		if err == nil || retry > 6 {
+			log.Printf("elasticsearch demo documents indexed")
+			break
+		}
+		if err.Error() == "exit status 7" {
+			retry++
+			log.Printf("elasticsearch not available. retry: %d", retry)
+			time.Sleep(time.Second * 10)
+		} else {
+			log.Printf("invalid dataset creation script. host: %s | %v", esHost, err)
+			break
+		}
+	}
 
 	<-stopChan
 	fmt.Println("")
