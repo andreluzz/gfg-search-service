@@ -34,7 +34,7 @@ func main() {
 	signal.Notify(stopChan, os.Interrupt)
 
 	go func() {
-		log.Println("Search service started serving on port 8080")
+		log.Println("Search service started on port 8080")
 		if err := server.ListenAndServe(); err != nil {
 			if strings.Contains(err.Error(), "bind: address already in use") {
 				log.Fatalf("port 8080 already in use\n")
@@ -46,22 +46,24 @@ func main() {
 	// execute dataset.sh to index documents to elasticsearch for testing purpose
 	// retry every 5 seconds to wait elasticsearch to be ready
 	retry := 0
-	for {
-		cmd := exec.Command("./dataset.sh", esHost)
-		err := cmd.Run()
-		if err == nil || retry > 6 {
-			log.Printf("elasticsearch demo documents indexed")
-			break
+	go func() {
+		for {
+			cmd := exec.Command("./dataset.sh", esHost)
+			err := cmd.Run()
+			if err == nil || retry > 6 {
+				log.Printf("elasticsearch demo documents indexed")
+				break
+			}
+			if err.Error() == "exit status 7" {
+				retry++
+				log.Printf("elasticsearch not available. retry: %d", retry)
+				time.Sleep(time.Second * 10)
+			} else {
+				log.Printf("invalid dataset creation script. host: %s | %v", esHost, err)
+				break
+			}
 		}
-		if err.Error() == "exit status 7" {
-			retry++
-			log.Printf("elasticsearch not available. retry: %d", retry)
-			time.Sleep(time.Second * 10)
-		} else {
-			log.Printf("invalid dataset creation script. host: %s | %v", esHost, err)
-			break
-		}
-	}
+	}()
 
 	<-stopChan
 	fmt.Println("")
