@@ -1,6 +1,7 @@
 # Search Service Rest API
 
-### Running with Docker
+### Running the service with Docker
+Access the service folder and execute the commands
 
 1. Build the image
 ``` 
@@ -12,7 +13,8 @@ docker run -it --network="host" andreluzz/go-gfg-search-service
 ```
 > Using --network="host" assuming elasticsearch server is running on the host at port 9200
 
-### Executing the unit tests
+### Executing the service unit tests
+Access the service folder and execute the commands
 
 1. Run the image overriding main command
 ``` 
